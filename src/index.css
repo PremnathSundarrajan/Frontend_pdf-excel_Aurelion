@@ -1,0 +1,333 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Paperless Design System - Calm, Trustworthy, AI-First */
+
+@layer base {
+  :root {
+    /* Warm off-white background */
+    --background: 40 25% 98%;
+    --foreground: 220 25% 18%;
+
+    /* Soft white cards */
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 18%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 18%;
+
+    /* Deep Indigo primary - trust & reliability */
+    --primary: 230 65% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Warm secondary */
+    --secondary: 220 15% 95%;
+    --secondary-foreground: 220 25% 25%;
+
+    /* Soft muted tones */
+    --muted: 220 12% 92%;
+    --muted-foreground: 220 15% 45%;
+
+    /* Soft Teal accent - AI glow & highlights */
+    --accent: 180 45% 92%;
+    --accent-foreground: 180 55% 30%;
+
+    /* Soft destructive */
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Gentle borders */
+    --border: 220 15% 88%;
+    --input: 220 15% 88%;
+    --ring: 230 65% 50%;
+
+    --radius: 0.75rem;
+
+    /* Success - Teal */
+    --success: 180 55% 42%;
+    --success-foreground: 0 0% 100%;
+
+    /* Warning - Soft Amber (review states) */
+    --warning: 38 92% 55%;
+    --warning-foreground: 38 95% 15%;
+
+    /* Indigo palette */
+    --indigo-50: 230 60% 97%;
+    --indigo-100: 230 55% 92%;
+    --indigo-200: 230 50% 85%;
+    --indigo-500: 230 65% 50%;
+    --indigo-600: 230 70% 44%;
+    --indigo-700: 230 75% 38%;
+
+    /* Teal palette - AI highlights */
+    --teal-50: 180 50% 97%;
+    --teal-100: 180 45% 92%;
+    --teal-200: 180 45% 85%;
+    --teal-500: 180 55% 42%;
+    --teal-600: 180 60% 35%;
+    --teal-700: 180 65% 28%;
+
+    /* Amber palette - Review states */
+    --amber-50: 38 90% 96%;
+    --amber-100: 38 85% 90%;
+    --amber-500: 38 92% 55%;
+
+    /* Cream/neutral backgrounds */
+    --cream-50: 40 30% 99%;
+    --cream-100: 40 25% 96%;
+    --cream-200: 40 20% 92%;
+
+    /* Shadows */
+    --shadow-soft: 0 2px 8px -2px hsl(220 25% 18% / 0.06);
+    --shadow-medium: 0 4px 16px -4px hsl(220 25% 18% / 0.1);
+    --shadow-large: 0 8px 32px -8px hsl(220 25% 18% / 0.14);
+  }
+
+  .dark {
+    /* Deep slate background */
+    --background: 220 25% 8%;
+    --foreground: 220 15% 92%;
+
+    --card: 220 22% 12%;
+    --card-foreground: 220 15% 92%;
+
+    --popover: 220 22% 12%;
+    --popover-foreground: 220 15% 92%;
+
+    /* Indigo primary - lighter for dark mode */
+    --primary: 230 70% 62%;
+    --primary-foreground: 220 25% 8%;
+
+    --secondary: 220 18% 18%;
+    --secondary-foreground: 220 15% 85%;
+
+    --muted: 220 18% 16%;
+    --muted-foreground: 220 12% 55%;
+
+    /* Teal accent with glow effect */
+    --accent: 180 35% 18%;
+    --accent-foreground: 180 55% 70%;
+
+    --destructive: 0 60% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 18% 20%;
+    --input: 220 18% 20%;
+    --ring: 230 70% 62%;
+
+    /* Success - Teal glow */
+    --success: 180 55% 50%;
+    --success-foreground: 220 25% 8%;
+
+    /* Warning - Amber */
+    --warning: 38 90% 55%;
+    --warning-foreground: 38 95% 10%;
+
+    /* Indigo palette - dark mode */
+    --indigo-50: 230 25% 15%;
+    --indigo-100: 230 25% 20%;
+    --indigo-200: 230 30% 28%;
+    --indigo-500: 230 70% 62%;
+    --indigo-600: 230 75% 68%;
+    --indigo-700: 230 80% 75%;
+
+    /* Teal palette - AI glow */
+    --teal-50: 180 25% 12%;
+    --teal-100: 180 30% 18%;
+    --teal-200: 180 35% 25%;
+    --teal-500: 180 55% 50%;
+    --teal-600: 180 60% 58%;
+    --teal-700: 180 65% 65%;
+
+    /* Amber palette */
+    --amber-50: 38 30% 12%;
+    --amber-100: 38 40% 18%;
+    --amber-500: 38 90% 55%;
+
+    /* Cream/neutral - dark mode */
+    --cream-50: 220 20% 10%;
+    --cream-100: 220 18% 14%;
+    --cream-200: 220 18% 18%;
+
+    --shadow-soft: 0 2px 8px -2px hsl(0 0% 0% / 0.25);
+    --shadow-medium: 0 4px 16px -4px hsl(0 0% 0% / 0.35);
+    --shadow-large: 0 8px 32px -8px hsl(0 0% 0% / 0.45);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    letter-spacing: -0.011em;
+  }
+
+  /* Refined typography hierarchy */
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-foreground tracking-tight;
+    text-wrap: balance;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.1];
+  }
+
+  h2 {
+    @apply text-2xl md:text-3xl lg:text-4xl font-bold leading-[1.2];
+  }
+
+  h3 {
+    @apply text-xl md:text-2xl font-semibold leading-[1.3];
+  }
+
+  p {
+    @apply leading-relaxed;
+    text-wrap: pretty;
+  }
+
+  /* Focus states - gentle and accessible */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-primary/30 ring-offset-2 ring-offset-background;
+    transition: box-shadow 150ms ease-out;
+  }
+
+  /* Smooth selection */
+  ::selection {
+    @apply bg-primary/15 text-foreground;
+  }
+}
+
+@layer components {
+  /* Glass card with soft blur */
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-xl border border-border/50 shadow-soft;
+  }
+
+  /* Gradient text - primary brand */
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary via-indigo-500 to-indigo-600 bg-clip-text text-transparent;
+  }
+
+  /* Gradient text - teal accent */
+  .gradient-text-teal {
+    @apply bg-gradient-to-r from-teal-500 to-teal-600 bg-clip-text text-transparent;
+  }
+
+  /* Gentle hover lift effect */
+  .hover-lift {
+    @apply transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-medium;
+  }
+
+  /* Upload zone styling */
+  .upload-zone {
+    @apply border-2 border-dashed border-border/60 rounded-2xl p-10 transition-all duration-200 ease-out;
+    @apply hover:border-primary/40 hover:bg-indigo-50/50;
+  }
+
+  .upload-zone-active {
+    @apply border-primary/60 bg-indigo-50/70 scale-[1.01];
+  }
+
+  /* Button gradient for primary */
+  .btn-gradient {
+    @apply bg-gradient-to-b from-primary to-indigo-600 hover:from-indigo-600 hover:to-indigo-700;
+    @apply shadow-soft hover:shadow-medium transition-all duration-150 ease-out;
+  }
+
+  /* AI processing glow - subtle and intentional */
+  .ai-glow {
+    @apply ring-2 ring-teal-500/25 shadow-[0_0_24px_-8px_hsl(180_55%_42%/0.25)];
+  }
+
+  /* Review/warning state - amber accent */
+  .review-highlight {
+    @apply bg-amber-50 border-amber-500/30 text-amber-500;
+  }
+
+  /* Section spacing - generous breathing room */
+  .section-padding {
+    @apply py-20 md:py-28 lg:py-32 px-4 md:px-6;
+  }
+
+  /* Card base style */
+  .card-base {
+    @apply bg-card border border-border/60 rounded-2xl shadow-soft transition-all duration-200;
+  }
+
+  /* Skeleton loader */
+  .skeleton {
+    @apply bg-muted animate-pulse rounded-lg;
+  }
+}
+
+@layer utilities {
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+
+  .shadow-medium {
+    box-shadow: var(--shadow-medium);
+  }
+
+  .shadow-large {
+    box-shadow: var(--shadow-large);
+  }
+
+  /* Gentle float animation */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  /* Soft pulse animation */
+  .animate-pulse-soft {
+    animation: pulse-soft 3s ease-in-out infinite;
+  }
+
+  /* Smooth fade in */
+  .animate-fade-in-up {
+    animation: fade-in-up 0.5s ease-out forwards;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+  }
+
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.75; }
+  }
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Transition utilities */
+  .transition-gentle {
+    @apply transition-all duration-200 ease-out;
+  }
+
+  .transition-smooth {
+    @apply transition-all duration-300 ease-out;
+  }
+}
