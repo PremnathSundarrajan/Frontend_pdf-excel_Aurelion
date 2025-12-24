@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { UploadZone } from "@/components/upload/UploadZone";
-import { Sparkles, Zap, Shield, Users, FileText } from "lucide-react";
+import { UploadZoneEuro } from "@/components/upload/UploadZoneEuro";
+import { Sparkles, Zap, Shield, Users, FileText, Euro } from "lucide-react";
 import axios from "axios";
 
 const features = [
@@ -47,6 +48,7 @@ type ConversionStatus = "idle" | "processing";
 
 const Index = () => {
   const [status, setStatus] = useState<ConversionStatus>("idle");
+  const [statusEuro, setStatusEuro] = useState<ConversionStatus>("idle");
 
   const handleUpload = async (files: File[]) => {
     console.log("handleUpload triggered with", files.length, "files.");
@@ -60,7 +62,7 @@ const Index = () => {
       formData.append("pdfs", file);
     });
 
-    console.log("FormData created. Calling API at https://convert-pdf-to-excel-1z5e.onrender.com/convert...");
+    console.log("FormData created. Calling API at http://localhost:3000/convert...");
     try {
       const response = await axios.post("https://convert-pdf-to-excel-1z5e.onrender.com/convert", formData, {
         responseType: 'blob', // Important for file downloads
@@ -75,16 +77,16 @@ const Index = () => {
       const contentDisposition = response.headers['content-disposition'];
       let filename = 'converted.xlsx';
       if (contentDisposition) {
-          const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
-          if (filenameMatch && filenameMatch.length === 2)
-              filename = filenameMatch[1];
+        const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+        if (filenameMatch && filenameMatch.length === 2)
+          filename = filenameMatch[1];
       }
       link.setAttribute('download', filename);
       document.body.appendChild(link);
       console.log("Triggering download for", filename);
       link.click();
       link.remove();
-      
+
       // Reset state after download
       console.log("Setting status back to 'idle' in 1 second.");
       setTimeout(() => {
@@ -97,14 +99,74 @@ const Index = () => {
       if (axios.isAxiosError(error)) {
         console.error("Axios error details:", error.toJSON());
         if (error.response) {
-            console.error("Response data:", error.response.data);
-            console.error("Response status:", error.response.status);
-            console.error("Response headers:", error.response.headers);
+          console.error("Response data:", error.response.data);
+          console.error("Response status:", error.response.status);
+          console.error("Response headers:", error.response.headers);
         }
       }
       console.error("--- END ERROR ---");
       alert("An error occurred during the conversion. Please check the console for details.");
       setStatus("idle");
+    }
+  };
+
+  // Handler for Euro invoice conversion (separate state)
+  const handleUploadEuro = async (files: File[]) => {
+    console.log("handleUploadEuro triggered with", files.length, "files.");
+    if (files.length === 0) return;
+
+    setStatusEuro("processing");
+    console.log("StatusEuro set to 'processing'");
+
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append("pdfs", file);
+    });
+
+    console.log("FormData created. Calling API at https://convert-pdf-to-excel-1z5e.onrender.com/convert-euro...");
+    try {
+      const response = await axios.post("https://convert-pdf-to-excel-1z5e.onrender.com/convert-euro", formData, {
+        responseType: 'blob', // Important for file downloads
+      });
+      console.log("API call successful. Response:", response);
+
+      // Create a link and trigger the download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      const contentDisposition = response.headers['content-disposition'];
+      let filename = 'converted_euro.xlsx';
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+        if (filenameMatch && filenameMatch.length === 2)
+          filename = filenameMatch[1];
+      }
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      console.log("Triggering download for", filename);
+      link.click();
+      link.remove();
+
+      // Reset state after download
+      console.log("Setting statusEuro back to 'idle' in 1 second.");
+      setTimeout(() => {
+        setStatusEuro("idle");
+      }, 1000);
+
+    } catch (error) {
+      console.error("--- ERROR DURING EURO UPLOAD ---");
+      console.error(error);
+      if (axios.isAxiosError(error)) {
+        console.error("Axios error details:", error.toJSON());
+        if (error.response) {
+          console.error("Response data:", error.response.data);
+          console.error("Response status:", error.response.status);
+          console.error("Response headers:", error.response.headers);
+        }
+      }
+      console.error("--- END ERROR ---");
+      alert("An error occurred during the Euro invoice conversion. Please check the console for details.");
+      setStatusEuro("idle");
     }
   };
 
@@ -145,7 +207,7 @@ const Index = () => {
                 transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
                 className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-14 leading-relaxed"
               >
-                Invoices, PDFs, scans — our AI understands them so you don't have to. 
+                Invoices, PDFs, scans — our AI understands them so you don't have to.
                 Stop typing. Start converting.
               </motion.p>
 
@@ -176,6 +238,78 @@ const Index = () => {
                 Your Excel file will be downloaded in a few seconds.
               </h1>
               <p className="text-muted-foreground">Please wait...</p>
+            </motion.div>
+          )}
+        </div>
+      </section>
+
+      {/* Euro Invoice Converter Section */}
+      <section className="py-20 md:py-24 px-4 bg-gradient-to-b from-emerald-50/50 to-background">
+        <div className="container mx-auto max-w-3xl text-center">
+          {statusEuro === "idle" ? (
+            <>
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+              >
+                <span className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100/60 rounded-full text-sm text-emerald-700 mb-8">
+                  <Euro className="w-4 h-4" />
+                  Euro Invoice Extraction
+                </span>
+              </motion.div>
+
+              <motion.h2
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ delay: 0.1, duration: 0.5, ease: "easeOut" }}
+                className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 leading-[1.1] tracking-tight"
+              >
+                Extract Euro Invoices.{" "}
+                <span className="text-emerald-600">Perfectly.</span>
+              </motion.h2>
+
+              <motion.p
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
+                className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-14 leading-relaxed"
+              >
+                Specialized extraction for European invoices with € amounts.
+                Preserves dates (dd.mm.yy), references with hyphens, and euro formatting.
+              </motion.p>
+
+              {/* Euro Upload Zone */}
+              <UploadZoneEuro onUpload={handleUploadEuro} disabled={statusEuro === 'processing'} />
+
+              {/* Trust message */}
+              <motion.p
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ delay: 0.6, duration: 0.6 }}
+                className="text-sm text-muted-foreground mt-10"
+              >
+                6 columns: Date • Party • Reference • Material • Quantity • Amount (€)
+              </motion.p>
+            </>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="text-center mb-14"
+            >
+              <div className="w-14 h-14 rounded-2xl bg-emerald-100/60 flex items-center justify-center mx-auto mb-6">
+                <Euro className="w-7 h-7 text-emerald-600" />
+              </div>
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                Your Euro Invoice Excel will be downloaded shortly.
+              </h2>
+              <p className="text-muted-foreground">Processing your invoice data...</p>
             </motion.div>
           )}
         </div>
