@@ -37,7 +37,7 @@ const pricingPlans = [
     price: "$49",
     description: "For growing businesses",
     features: [
-      "Unlimited documents",
+      "1000 documents per month",
       "Highest AI accuracy",
       "Custom templates",
       "Team collaboration",

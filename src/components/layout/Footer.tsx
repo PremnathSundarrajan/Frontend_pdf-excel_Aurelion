@@ -66,10 +66,10 @@ export function Footer() {
 
         <div className="mt-14 pt-6 border-t border-border/40 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            © 2024 Paperless. All rights reserved.
+            © 2025 Paperless. All rights reserved.
           </p>
           <p className="text-sm text-muted-foreground flex items-center gap-1.5">
-            Made with <Heart className="w-3.5 h-3.5 text-destructive/80 fill-destructive/80" /> for teams who hate manual data entry
+            Made By Aurelion 
           </p>
         </div>
       </div>

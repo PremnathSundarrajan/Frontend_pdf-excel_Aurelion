@@ -187,7 +187,7 @@ const Index = () => {
               >
                 <span className="inline-flex items-center gap-2 px-4 py-2 bg-accent/60 rounded-full text-sm text-accent-foreground mb-8">
                   <Sparkles className="w-4 h-4" />
-                  AI-powered document conversion
+                  Consignment 
                 </span>
               </motion.div>
 
@@ -256,7 +256,7 @@ const Index = () => {
               >
                 <span className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100/60 rounded-full text-sm text-emerald-700 mb-8">
                   <Euro className="w-4 h-4" />
-                  Euro Invoice Extraction
+                  Order Info
                 </span>
               </motion.div>
 
@@ -267,7 +267,7 @@ const Index = () => {
                 transition={{ delay: 0.1, duration: 0.5, ease: "easeOut" }}
                 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 leading-[1.1] tracking-tight"
               >
-                Extract Euro Invoices.{" "}
+                Extract Order Info.{" "}
                 <span className="text-emerald-600">Perfectly.</span>
               </motion.h2>
 
@@ -278,7 +278,7 @@ const Index = () => {
                 transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
                 className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-14 leading-relaxed"
               >
-                Specialized extraction for European invoices with € amounts.
+                Specialized extraction for Order Info with € amounts.
                 Preserves dates (dd.mm.yy), references with hyphens, and euro formatting.
               </motion.p>
 
@@ -293,7 +293,7 @@ const Index = () => {
                 transition={{ delay: 0.6, duration: 0.6 }}
                 className="text-sm text-muted-foreground mt-10"
               >
-                6 columns: Date • Party • Reference • Material • Quantity • Amount (€)
+                6 columns: Date • Client • Order No • Material • Delivery • Kgs • m<sup>3</sup> • Material Cost (€) • Extra Fee (€) • Total Cost (€)
               </motion.p>
             </>
           ) : (
@@ -307,7 +307,7 @@ const Index = () => {
                 <Euro className="w-7 h-7 text-emerald-600" />
               </div>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                Your Euro Invoice Excel will be downloaded shortly.
+                Your Order Info Excel will be downloaded shortly.
               </h2>
               <p className="text-muted-foreground">Processing your invoice data...</p>
             </motion.div>

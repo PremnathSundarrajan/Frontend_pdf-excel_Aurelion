@@ -90,7 +90,7 @@ export function UploadZoneEuro({ onUpload, disabled }: UploadZoneEuroProps) {
 
                     <div className="text-center">
                         <p className="text-foreground font-medium mb-1.5">
-                            {isDragging ? "Drop Euro invoice PDFs here" : "Drop Euro Invoice PDFs here or click to upload"}
+                            {isDragging ? "Drop Order Info PDFs here" : "Drop Order Info PDFs here or click to upload"}
                         </p>
                         <p className="text-sm text-muted-foreground">
                             We'll extract tables with € amounts to Excel.
@@ -113,7 +113,7 @@ export function UploadZoneEuro({ onUpload, disabled }: UploadZoneEuroProps) {
             {/* File list and actions */}
             {files.length > 0 && (
                 <div className="mt-6 w-full max-w-xl mx-auto">
-                    <div className="mb-3 font-medium">Euro invoice files to convert ({files.length})</div>
+                    <div className="mb-3 font-medium">Order Info files to convert ({files.length})</div>
                     <ul className="space-y-2">
                         {files.map((file, i) => (
                             <li key={`${file.name}_${file.size}_${file.lastModified}`} className="flex items-center justify-between border border-emerald-200 rounded p-3 bg-emerald-50/30">
