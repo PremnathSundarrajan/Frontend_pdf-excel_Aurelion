@@ -6,7 +6,6 @@ import { useState } from "react";
 
 const navItems = [
   { name: "Home", path: "/" },
-  { name: "Dashboard", path: "/dashboard" },
   { name: "Pricing", path: "/pricing" },
 ];
 
@@ -36,11 +35,10 @@ export function Header() {
             <Link
               key={item.path}
               to={item.path}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
-                location.pathname === item.path
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${location.pathname === item.path
                   ? "bg-accent/80 text-accent-foreground"
                   : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-              }`}
+                }`}
             >
               {item.name}
             </Link>
@@ -83,11 +81,10 @@ export function Header() {
                   key={item.path}
                   to={item.path}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-150 ${
-                    location.pathname === item.path
+                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-150 ${location.pathname === item.path
                       ? "bg-accent/80 text-accent-foreground"
                       : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                  }`}
+                    }`}
                 >
                   {item.name}
                 </Link>

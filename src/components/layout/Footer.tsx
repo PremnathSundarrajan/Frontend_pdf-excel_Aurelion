@@ -15,7 +15,7 @@ export function Footer() {
               <span className="font-semibold text-lg tracking-tight">Paperless</span>
             </Link>
             <p className="text-muted-foreground text-sm max-w-xs leading-relaxed">
-              Turn messy documents into clean Excel sheets. 
+              Turn messy documents into clean Excel sheets.
               No more manual data entry. Ever.
             </p>
           </div>
@@ -32,11 +32,6 @@ export function Footer() {
               <li>
                 <Link to="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-150">
                   Pricing
-                </Link>
-              </li>
-              <li>
-                <Link to="/dashboard" className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-150">
-                  Dashboard
                 </Link>
               </li>
             </ul>
@@ -69,7 +64,7 @@ export function Footer() {
             © 2025 Paperless. All rights reserved.
           </p>
           <p className="text-sm text-muted-foreground flex items-center gap-1.5">
-            Made By Aurelion 
+            Made By Aurelion
           </p>
         </div>
       </div>
