@@ -76,7 +76,8 @@ const Index = () => {
       const link = document.createElement('a');
       link.href = url;
       const contentDisposition = response.headers['content-disposition'];
-      let filename = 'converted.xlsx';
+      const dateStr = new Date().toISOString().split('T')[0];
+      let filename = `Converted_consignment_${dateStr}.xlsx`;
       if (contentDisposition) {
         const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
         if (filenameMatch && filenameMatch.length === 2)
@@ -136,7 +137,8 @@ const Index = () => {
       const link = document.createElement('a');
       link.href = url;
       const contentDisposition = response.headers['content-disposition'];
-      let filename = 'converted_euro.xlsx';
+      const dateStr = new Date().toISOString().split('T')[0];
+      let filename = `Converted_orderinfo_${dateStr}.xlsx`;
       if (contentDisposition) {
         const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
         if (filenameMatch && filenameMatch.length === 2)
