@@ -162,7 +162,7 @@ export function UploadZoneEuro({ onUpload, disabled }: UploadZoneEuroProps) {
                             disabled={disabled || loading}
                             className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-60 transition-colors"
                         >
-                            {loading ? 'Converting Euro Invoice...' : 'Convert Euro Invoice'}
+                            {loading ? 'Converting...' : 'Convert'}
                         </button>
 
                         <button

@@ -4,6 +4,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { UploadZone } from "@/components/upload/UploadZone";
 import { UploadZoneEuro } from "@/components/upload/UploadZoneEuro";
+import { ProcessingOverlay } from "@/components/upload/ProcessingOverlay";
 import { Sparkles, Zap, Shield, Users, FileText, Euro } from "lucide-react";
 import axios from "axios";
 
@@ -176,144 +177,110 @@ const Index = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className="pt-36 pb-20 md:pt-40 md:pb-24 px-4">
+      <section className="pt-36 pb-20 md:pt-40 md:pb-24 px-4 overflow-hidden">
         <div className="container mx-auto max-w-3xl text-center">
-          {status === "idle" ? (
-            <>
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-              >
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-accent/60 rounded-full text-sm text-accent-foreground mb-8">
-                  <Sparkles className="w-4 h-4" />
-                  Consignment 
-                </span>
-              </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-accent/60 rounded-full text-sm text-accent-foreground mb-8">
+              <Sparkles className="w-4 h-4" />
+              Consignment
+            </span>
+          </motion.div>
 
-              <motion.h1
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1, duration: 0.5, ease: "easeOut" }}
-                className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-[1.1] tracking-tight"
-              >
-                Turn documents into Excel.{" "}
-                <span className="gradient-text">Like magic.</span>
-              </motion.h1>
+          <motion.h1
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.5, ease: "easeOut" }}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-[1.1] tracking-tight"
+          >
+            Turn documents into Excel.{" "}
+            <span className="gradient-text">Like magic.</span>
+          </motion.h1>
 
-              <motion.p
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
-                className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-14 leading-relaxed"
-              >
-                Invoices, PDFs, scans — our AI understands them so you don't have to.
-                Stop typing. Start converting.
-              </motion.p>
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
+            className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-14 leading-relaxed"
+          >
+            Invoices, PDFs, scans — our AI understands them so you don't have to.
+            Stop typing. Start converting.
+          </motion.p>
 
-              {/* Upload Zone */}
-              <UploadZone onUpload={handleUpload} disabled={status === 'processing'} />
+          {/* Upload Zone */}
+          <UploadZone onUpload={handleUpload} disabled={status === 'processing'} />
 
-              {/* Trust message */}
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.6, duration: 0.6 }}
-                className="text-sm text-muted-foreground mt-10"
-              >
-                Loved by teams who hate manual data entry
-              </motion.p>
-            </>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-              className="text-center mb-14"
-            >
-              <div className="w-14 h-14 rounded-2xl bg-accent/60 flex items-center justify-center mx-auto mb-6">
-                <FileText className="w-7 h-7 text-primary" />
-              </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                Your Excel file will be downloaded in a few seconds.
-              </h1>
-              <p className="text-muted-foreground">Please wait...</p>
-            </motion.div>
-          )}
+          {/* Trust message */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.6 }}
+            className="text-sm text-muted-foreground mt-10"
+          >
+            Loved by teams who hate manual data entry
+          </motion.p>
         </div>
       </section>
+
+      <ProcessingOverlay isOpen={status === "processing"} type="standard" />
 
       {/* Euro Invoice Converter Section */}
       <section className="py-20 md:py-24 px-4 bg-gradient-to-b from-emerald-50/50 to-background">
         <div className="container mx-auto max-w-3xl text-center">
-          {statusEuro === "idle" ? (
-            <>
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-              >
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100/60 rounded-full text-sm text-emerald-700 mb-8">
-                  <Euro className="w-4 h-4" />
-                  Order Info
-                </span>
-              </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100/60 rounded-full text-sm text-emerald-700 mb-8">
+              <Euro className="w-4 h-4" />
+              Order Info
+            </span>
+          </motion.div>
 
-              <motion.h2
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ delay: 0.1, duration: 0.5, ease: "easeOut" }}
-                className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 leading-[1.1] tracking-tight"
-              >
-                Extract Order Info.{" "}
-                <span className="text-emerald-600">Perfectly.</span>
-              </motion.h2>
+          <motion.h2
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ delay: 0.1, duration: 0.5, ease: "easeOut" }}
+            className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 leading-[1.1] tracking-tight"
+          >
+            Extract Order Info.{" "}
+            <span className="text-emerald-600">Perfectly.</span>
+          </motion.h2>
 
-              <motion.p
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
-                className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-14 leading-relaxed"
-              >
-                Specialized extraction for Order Info with € amounts.
-                Preserves dates (dd.mm.yy), references with hyphens, and euro formatting.
-              </motion.p>
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
+            className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-14 leading-relaxed"
+          >
+            Specialized extraction for Order Info with € amounts.
+            Preserves dates (dd.mm.yy), references with hyphens, and euro formatting.
+          </motion.p>
 
-              {/* Euro Upload Zone */}
-              <UploadZoneEuro onUpload={handleUploadEuro} disabled={statusEuro === 'processing'} />
+          {/* Euro Upload Zone */}
+          <UploadZoneEuro onUpload={handleUploadEuro} disabled={statusEuro === 'processing'} />
 
-              {/* Trust message */}
-              <motion.p
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ delay: 0.6, duration: 0.6 }}
-                className="text-sm text-muted-foreground mt-10"
-              >
-                6 columns: Date • Client • Order No • Material • Delivery • Kgs • m<sup>3</sup> • Material Cost (€) • Extra Fee (€) • Total Cost (€)
-              </motion.p>
-            </>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-              className="text-center mb-14"
-            >
-              <div className="w-14 h-14 rounded-2xl bg-emerald-100/60 flex items-center justify-center mx-auto mb-6">
-                <Euro className="w-7 h-7 text-emerald-600" />
-              </div>
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                Your Order Info Excel will be downloaded shortly.
-              </h2>
-              <p className="text-muted-foreground">Processing your invoice data...</p>
-            </motion.div>
-          )}
+          {/* Trust message */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ delay: 0.6, duration: 0.6 }}
+            className="text-sm text-muted-foreground mt-10"
+          >
+            6 columns: Date • Client • Order No • Material • Delivery • Kgs • m<sup>3</sup> • Material Cost (€) • Extra Fee (€) • Total Cost (€)
+          </motion.p>
         </div>
       </section>
+
+      <ProcessingOverlay isOpen={statusEuro === "processing"} type="euro" />
 
       {/* Features Section */}
       <section className="py-24 md:py-32 px-4 bg-cream-100/50">
