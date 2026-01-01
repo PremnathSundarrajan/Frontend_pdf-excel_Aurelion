@@ -50,26 +50,56 @@ type ConversionStatus = "idle" | "processing";
 const Index = () => {
   const [status, setStatus] = useState<ConversionStatus>("idle");
   const [statusEuro, setStatusEuro] = useState<ConversionStatus>("idle");
+  const [progress, setProgress] = useState(0);
+  const [statusText, setStatusText] = useState("");
+  const [progressEuro, setProgressEuro] = useState(0);
+  const [statusTextEuro, setStatusTextEuro] = useState("");
+
+  const API_BASE_URL = "https://convert-pdf-to-excel-1z5e.onrender.com";
 
   const handleUpload = async (files: File[]) => {
     console.log("handleUpload triggered with", files.length, "files.");
     if (files.length === 0) return;
 
+    const jobId = `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     setStatus("processing");
-    console.log("Status set to 'processing'");
+    setProgress(10);
+    setStatusText("Request received / upload complete");
+    console.log("Status set to 'processing', jobId:", jobId);
+
+    // Initialize SSE
+    const eventSource = new EventSource(`${API_BASE_URL}/progress/${jobId}`);
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        console.log("SSE Update:", data);
+        setProgress(data.progress);
+        setStatusText(data.status);
+        if (data.progress === 100) {
+          eventSource.close();
+        }
+      } catch (e) {
+        console.error("Error parsing SSE data", e);
+      }
+    };
+
+    eventSource.onerror = (err) => {
+      console.error("SSE Error:", err);
+      eventSource.close();
+    };
 
     const formData = new FormData();
     files.forEach(file => {
       formData.append("pdfs", file);
     });
 
-    console.log("FormData created. Calling API at http://localhost:3000/convert...");
+    console.log(`FormData created. Calling API at ${API_BASE_URL}/convert?jobId=${jobId}...`);
     try {
-      const response = await axios.post("https://convert-pdf-to-excel-1z5e.onrender.com/convert", formData, {
+      const response = await axios.post(`${API_BASE_URL}/convert?jobId=${jobId}`, formData, {
         responseType: 'blob', // Important for file downloads
       });
-      console.log("API call successful. Response:", response);
-
+      console.log("API call successful.");
 
       // Create a link and trigger the download
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -85,30 +115,27 @@ const Index = () => {
       }
       link.setAttribute('download', filename);
       document.body.appendChild(link);
-      console.log("Triggering download for", filename);
       link.click();
       link.remove();
 
+      // Ensure 100% is shown before closing
+      setProgress(100);
+      setStatusText("File ready for download");
+
       // Reset state after download
-      console.log("Setting status back to 'idle' in 1 second.");
       setTimeout(() => {
         setStatus("idle");
-      }, 1000);
+        setProgress(0);
+        setStatusText("");
+      }, 2000);
 
     } catch (error) {
-      console.error("--- ERROR DURING UPLOAD ---");
-      console.error(error);
-      if (axios.isAxiosError(error)) {
-        console.error("Axios error details:", error.toJSON());
-        if (error.response) {
-          console.error("Response data:", error.response.data);
-          console.error("Response status:", error.response.status);
-          console.error("Response headers:", error.response.headers);
-        }
-      }
-      console.error("--- END ERROR ---");
+      eventSource.close();
+      console.error("--- ERROR DURING UPLOAD ---", error);
       alert("An error occurred during the conversion. Please check the console for details.");
       setStatus("idle");
+      setProgress(0);
+      setStatusText("");
     }
   };
 
@@ -117,20 +144,45 @@ const Index = () => {
     console.log("handleUploadEuro triggered with", files.length, "files.");
     if (files.length === 0) return;
 
+    const jobId = `job_euro_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     setStatusEuro("processing");
-    console.log("StatusEuro set to 'processing'");
+    setProgressEuro(10);
+    setStatusTextEuro("Request received / upload complete");
+    console.log("StatusEuro set to 'processing', jobId:", jobId);
+
+    // Initialize SSE
+    const eventSource = new EventSource(`${API_BASE_URL}/progress/${jobId}`);
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        console.log("SSE Euro Update:", data);
+        setProgressEuro(data.progress);
+        setStatusTextEuro(data.status);
+        if (data.progress === 100) {
+          eventSource.close();
+        }
+      } catch (e) {
+        console.error("Error parsing SSE data", e);
+      }
+    };
+
+    eventSource.onerror = (err) => {
+      console.error("SSE Euro Error:", err);
+      eventSource.close();
+    };
 
     const formData = new FormData();
     files.forEach(file => {
       formData.append("pdfs", file);
     });
 
-    console.log("FormData created. Calling API at https://convert-pdf-to-excel-1z5e.onrender.com/convert-euro...");
+    console.log(`FormData created. Calling API at ${API_BASE_URL}/convert-euro?jobId=${jobId}...`);
     try {
-      const response = await axios.post("https://convert-pdf-to-excel-1z5e.onrender.com/convert-euro", formData, {
+      const response = await axios.post(`${API_BASE_URL}/convert-euro?jobId=${jobId}`, formData, {
         responseType: 'blob', // Important for file downloads
       });
-      console.log("API call successful. Response:", response);
+      console.log("API call successful.");
 
       // Create a link and trigger the download
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -146,30 +198,27 @@ const Index = () => {
       }
       link.setAttribute('download', filename);
       document.body.appendChild(link);
-      console.log("Triggering download for", filename);
       link.click();
       link.remove();
 
+      // Ensure 100% is shown
+      setProgressEuro(100);
+      setStatusTextEuro("File ready for download");
+
       // Reset state after download
-      console.log("Setting statusEuro back to 'idle' in 1 second.");
       setTimeout(() => {
         setStatusEuro("idle");
-      }, 1000);
+        setProgressEuro(0);
+        setStatusTextEuro("");
+      }, 2000);
 
     } catch (error) {
-      console.error("--- ERROR DURING EURO UPLOAD ---");
-      console.error(error);
-      if (axios.isAxiosError(error)) {
-        console.error("Axios error details:", error.toJSON());
-        if (error.response) {
-          console.error("Response data:", error.response.data);
-          console.error("Response status:", error.response.status);
-          console.error("Response headers:", error.response.headers);
-        }
-      }
-      console.error("--- END ERROR ---");
+      eventSource.close();
+      console.error("--- ERROR DURING EURO UPLOAD ---", error);
       alert("An error occurred during the Euro invoice conversion. Please check the console for details.");
       setStatusEuro("idle");
+      setProgressEuro(0);
+      setStatusTextEuro("");
     }
   };
 
@@ -227,7 +276,12 @@ const Index = () => {
         </div>
       </section>
 
-      <ProcessingOverlay isOpen={status === "processing"} type="standard" />
+      <ProcessingOverlay
+        isOpen={status === "processing"}
+        type="standard"
+        progress={progress}
+        statusText={statusText}
+      />
 
       {/* Euro Invoice Converter Section */}
       <section className="py-20 md:py-24 px-4 bg-gradient-to-b from-emerald-50/50 to-background">
@@ -282,7 +336,12 @@ const Index = () => {
         </div>
       </section>
 
-      <ProcessingOverlay isOpen={statusEuro === "processing"} type="euro" />
+      <ProcessingOverlay
+        isOpen={statusEuro === "processing"}
+        type="euro"
+        progress={progressEuro}
+        statusText={statusTextEuro}
+      />
 
       {/* Features Section */}
       <section className="py-24 md:py-32 px-4 bg-cream-100/50">
