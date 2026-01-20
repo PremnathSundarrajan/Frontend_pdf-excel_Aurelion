@@ -4,8 +4,9 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { UploadZone } from "@/components/upload/UploadZone";
 import { UploadZoneEuro } from "@/components/upload/UploadZoneEuro";
+import { UploadZoneHeaderRemoval } from "@/components/upload/UploadZoneHeaderRemoval";
 import { ProcessingOverlay } from "@/components/upload/ProcessingOverlay";
-import { Sparkles, Zap, Shield, Users, FileText, Euro } from "lucide-react";
+import { Sparkles, Zap, Shield, Users, FileText, Euro, Scissors } from "lucide-react";
 import axios from "axios";
 
 const features = [
@@ -50,12 +51,16 @@ type ConversionStatus = "idle" | "processing";
 const Index = () => {
   const [status, setStatus] = useState<ConversionStatus>("idle");
   const [statusEuro, setStatusEuro] = useState<ConversionStatus>("idle");
+  const [statusHeader, setStatusHeader] = useState<ConversionStatus>("idle");
   const [progress, setProgress] = useState(0);
   const [statusText, setStatusText] = useState("");
   const [progressEuro, setProgressEuro] = useState(0);
   const [statusTextEuro, setStatusTextEuro] = useState("");
+  const [progressHeader, setProgressHeader] = useState(0);
+  const [statusTextHeader, setStatusTextHeader] = useState("");
 
   const API_BASE_URL = "https://convert-pdf-to-excel-1z5e.onrender.com";
+  //const API_BASE_URL = "http://localhost:3000";
 
   const handleUpload = async (files: File[]) => {
     console.log("handleUpload triggered with", files.length, "files.");
@@ -223,6 +228,105 @@ const Index = () => {
   };
 
 
+  const handleUploadHeader = async (files: File[]) => {
+    console.log("handleUploadHeader triggered with", files.length, "files.");
+    if (files.length === 0) return;
+
+    const jobId = `job_header_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    setStatusHeader("processing");
+    setProgressHeader(10);
+    setStatusTextHeader("Request received / upload complete");
+
+    const eventSource = new EventSource(`${API_BASE_URL}/progress/${jobId}`);
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        setProgressHeader(data.progress);
+        setStatusTextHeader(data.status);
+        if (data.progress === 100) {
+          eventSource.close();
+        }
+      } catch (e) {
+        console.error("Error parsing SSE data", e);
+      }
+    };
+
+    eventSource.onerror = (err) => {
+      console.error("SSE Header Error:", err);
+      eventSource.close();
+    };
+
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append("pdfs", file);
+    });
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/remove-header?jobId=${jobId}`, formData, {
+        responseType: 'blob',
+      });
+
+      const url = window.URL.createObjectURL(response.data);
+      const link = document.createElement('a');
+      link.href = url;
+      const contentDisposition = response.headers['content-disposition'];
+      const dateStr = new Date().toISOString().split('T')[0];
+      let filename = `Cleaned_Documents_${dateStr}.zip`;
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+        if (filenameMatch && filenameMatch.length === 2)
+          filename = filenameMatch[1];
+      }
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      setProgressHeader(100);
+      setStatusTextHeader("File ready for download");
+
+      setTimeout(() => {
+        setStatusHeader("idle");
+        setProgressHeader(0);
+        setStatusTextHeader("");
+      }, 2000);
+
+    } catch (error: any) {
+      eventSource.close();
+      console.error("--- ERROR DURING HEADER REMOVAL ---", error);
+
+      let errorMessage = "An error occurred during header removal.";
+
+      // Try to read blob error
+      if (error.response && error.response.data instanceof Blob) {
+        try {
+          const text = await error.response.data.text();
+          const json = JSON.parse(text);
+          if (json.error) {
+            errorMessage = `Error: ${json.error}`;
+          } else {
+            errorMessage = `Error: ${text}`;
+          }
+        } catch (e) {
+          // If parsing fails, use status text
+          if (error.response.statusText) {
+            errorMessage += ` (${error.response.statusText})`;
+          }
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      alert(errorMessage + "\n\nPlease check the console for more details.");
+
+      setStatusHeader("idle");
+      setProgressHeader(0);
+      setStatusTextHeader("");
+    }
+  };
+
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -341,6 +445,64 @@ const Index = () => {
         type="euro"
         progress={progressEuro}
         statusText={statusTextEuro}
+      />
+
+      {/* PDF Header Removal Section */}
+      <section className="py-20 md:py-24 px-4 bg-gradient-to-b from-orange-50/50 to-background">
+        <div className="container mx-auto max-w-3xl text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-orange-100/60 rounded-full text-sm text-orange-700 mb-8">
+              <Scissors className="w-4 h-4" />
+              Header Removal
+            </span>
+          </motion.div>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ delay: 0.1, duration: 0.5, ease: "easeOut" }}
+            className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 leading-[1.1] tracking-tight"
+          >
+            Clean Your PDFs.{" "}
+            <span className="text-orange-600">Instantly.</span>
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
+            className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-14 leading-relaxed"
+          >
+            Remove company headers and pricing footers from multiple PDFs at once.
+            Get a single ZIP file with all your cleaned documents preserved perfectly.
+          </motion.p>
+
+          <UploadZoneHeaderRemoval onUpload={handleUploadHeader} disabled={statusHeader === 'processing'} />
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ delay: 0.6, duration: 0.6 }}
+            className="text-sm text-muted-foreground mt-10"
+          >
+            Powered by GPT-4o Vision and Code Interpreter
+          </motion.p>
+        </div>
+      </section>
+
+      <ProcessingOverlay
+        isOpen={statusHeader === "processing"}
+        type="standard"
+        progress={progressHeader}
+        statusText={statusTextHeader}
       />
 
       {/* Features Section */}
