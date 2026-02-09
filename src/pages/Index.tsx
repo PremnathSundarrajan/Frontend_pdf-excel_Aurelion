@@ -5,8 +5,9 @@ import { Footer } from "@/components/layout/Footer";
 import { UploadZone } from "@/components/upload/UploadZone";
 import { UploadZoneEuro } from "@/components/upload/UploadZoneEuro";
 import { UploadZoneHeaderRemoval } from "@/components/upload/UploadZoneHeaderRemoval";
+import { UploadZoneStrictPdfCleaner } from "@/components/upload/UploadZoneStrictPdfCleaner";
 import { ProcessingOverlay } from "@/components/upload/ProcessingOverlay";
-import { Sparkles, Zap, Shield, Users, FileText, Euro, Scissors } from "lucide-react";
+import { Sparkles, Zap, Shield, Users, FileText, Euro, Scissors, Eraser } from "lucide-react";
 import axios from "axios";
 
 const features = [
@@ -58,6 +59,9 @@ const Index = () => {
   const [statusTextEuro, setStatusTextEuro] = useState("");
   const [progressHeader, setProgressHeader] = useState(0);
   const [statusTextHeader, setStatusTextHeader] = useState("");
+  const [statusStrict, setStatusStrict] = useState<ConversionStatus>("idle");
+  const [progressStrict, setProgressStrict] = useState(0);
+  const [statusTextStrict, setStatusTextStrict] = useState("");
 
   const API_BASE_URL = "https://convert-pdf-to-excel-1z5e.onrender.com";
   //const API_BASE_URL = "http://localhost:3000";
@@ -327,6 +331,101 @@ const Index = () => {
   };
 
 
+  const handleUploadStrict = async (files: File[]) => {
+    console.log("handleUploadStrict triggered with", files.length, "files.");
+    if (files.length === 0) return;
+
+    const jobId = `job_strict_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    setStatusStrict("processing");
+    setProgressStrict(10);
+    setStatusTextStrict("Request received / upload complete");
+
+    const eventSource = new EventSource(`${API_BASE_URL}/progress/${jobId}`);
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        setProgressStrict(data.progress);
+        setStatusTextStrict(data.status);
+        if (data.progress === 100) {
+          eventSource.close();
+        }
+      } catch (e) {
+        console.error("Error parsing SSE data", e);
+      }
+    };
+
+    eventSource.onerror = (err) => {
+      console.error("SSE Strict Error:", err);
+      eventSource.close();
+    };
+
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append("pdfs", file);
+    });
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/strict-remove-header?jobId=${jobId}`, formData, {
+        responseType: 'blob',
+      });
+
+      const url = window.URL.createObjectURL(response.data);
+      const link = document.createElement('a');
+      link.href = url;
+      const contentDisposition = response.headers['content-disposition'];
+      const dateStr = new Date().toISOString().split('T')[0];
+      let filename = `Strictly_Cleaned_${dateStr}.pdf`;
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+        if (filenameMatch && filenameMatch.length === 2)
+          filename = filenameMatch[1];
+      }
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      setProgressStrict(100);
+      setStatusTextStrict("File ready for download");
+
+      setTimeout(() => {
+        setStatusStrict("idle");
+        setProgressStrict(0);
+        setStatusTextStrict("");
+      }, 2000);
+
+    } catch (error: any) {
+      eventSource.close();
+      console.error("--- ERROR DURING STRICT REMOVAL ---", error);
+
+      let errorMessage = "An error occurred during strict removal.";
+
+      if (error.response && error.response.data instanceof Blob) {
+        try {
+          const text = await error.response.data.text();
+          const json = JSON.parse(text);
+          if (json.error) {
+            errorMessage = `Error: ${json.error}`;
+          }
+        } catch (e) {
+          if (error.response.statusText) {
+            errorMessage += ` (${error.response.statusText})`;
+          }
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      alert(errorMessage + "\n\nPlease check the console for more details.");
+
+      setStatusStrict("idle");
+      setProgressStrict(0);
+      setStatusTextStrict("");
+    }
+  };
+
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -503,6 +602,65 @@ const Index = () => {
         type="standard"
         progress={progressHeader}
         statusText={statusTextHeader}
+      />
+
+      {/* Strict PDF Cleaner Section */}
+      <section className="py-20 md:py-24 px-4 bg-gradient-to-b from-purple-50/50 to-background">
+        <div className="container mx-auto max-w-3xl text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100/60 rounded-full text-sm text-purple-700 mb-8">
+              <Eraser className="w-4 h-4" />
+              Strict PDF Cleaner
+            </span>
+          </motion.div>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ delay: 0.1, duration: 0.5, ease: "easeOut" }}
+            className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 leading-[1.1] tracking-tight"
+          >
+            Surgical Cleaning.{" "}
+            <span className="text-purple-600">Zero Trash.</span>
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
+            className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-14 leading-relaxed"
+          >
+            Strictly removes everything above the table header row on Page 1.
+            Key-value based footer removal ensures drawings stay 100% safe.
+            Single file in, single file out.
+          </motion.p>
+
+          <UploadZoneStrictPdfCleaner onUpload={handleUploadStrict} disabled={statusStrict === 'processing'} />
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ delay: 0.6, duration: 0.6 }}
+            className="text-sm text-muted-foreground mt-10"
+          >
+            Removes: Total • Material • Extra Fee • kgs • m3 • m³
+          </motion.p>
+        </div>
+      </section>
+
+      <ProcessingOverlay
+        isOpen={statusStrict === "processing"}
+        type="standard"
+        progress={progressStrict}
+        statusText={statusTextStrict}
       />
 
       {/* Features Section */}
