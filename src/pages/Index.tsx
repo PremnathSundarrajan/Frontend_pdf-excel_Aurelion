@@ -63,8 +63,8 @@ const Index = () => {
   const [progressStrict, setProgressStrict] = useState(0);
   const [statusTextStrict, setStatusTextStrict] = useState("");
 
-  //const API_BASE_URL = "https://convert-pdf-to-excel-1z5e.onrender.com";
-  const API_BASE_URL = "http://localhost:3000";
+  const API_BASE_URL = "https://convert-pdf-to-excel-1z5e.onrender.com";
+  //const API_BASE_URL = "http://localhost:3000";
 
   const handleUpload = async (files: File[]) => {
     console.log("handleUpload triggered with", files.length, "files.");
@@ -602,7 +602,7 @@ const Index = () => {
         type="standard"
         progress={progressHeader}
         statusText={statusTextHeader}
-      />*/}
+      />
 
       {/* Strict PDF Cleaner Section */}
       <section className="py-20 md:py-24 px-4 bg-gradient-to-b from-purple-50/50 to-background">
