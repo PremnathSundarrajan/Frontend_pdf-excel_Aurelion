@@ -4,10 +4,11 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { UploadZone } from "@/components/upload/UploadZone";
 import { UploadZoneEuro } from "@/components/upload/UploadZoneEuro";
+import { UploadZoneCrateSummary } from "@/components/upload/UploadZoneCrateSummary";
 import { UploadZoneHeaderRemoval } from "@/components/upload/UploadZoneHeaderRemoval";
 import { UploadZoneStrictPdfCleaner } from "@/components/upload/UploadZoneStrictPdfCleaner";
 import { ProcessingOverlay } from "@/components/upload/ProcessingOverlay";
-import { Sparkles, Zap, Shield, Users, FileText, Euro, Scissors, Eraser } from "lucide-react";
+import { Sparkles, Zap, Shield, Users, FileText, Euro, Scissors, Eraser, Package } from "lucide-react";
 import axios from "axios";
 
 const features = [
@@ -62,8 +63,11 @@ const Index = () => {
   const [statusStrict, setStatusStrict] = useState<ConversionStatus>("idle");
   const [progressStrict, setProgressStrict] = useState(0);
   const [statusTextStrict, setStatusTextStrict] = useState("");
-  const API_BASE_URL = "https://convert-pdf-to-excel-1z5e.onrender.com";
-  //const API_BASE_URL = "http://localhost:3000";
+  const [statusCrate, setStatusCrate] = useState<ConversionStatus>("idle");
+  const [progressCrate, setProgressCrate] = useState(0);
+  const [statusTextCrate, setStatusTextCrate] = useState("");
+  // const API_BASE_URL = "https://convert-pdf-to-excel-1z5e.onrender.com";
+  const API_BASE_URL = "http://localhost:3000";
 
   const handleUpload = async (files: File[]) => {
     console.log("handleUpload triggered with", files.length, "files.");
@@ -425,6 +429,94 @@ const Index = () => {
   };
 
 
+  const handleUploadCrateSummary = async (files: File[]) => {
+    console.log("handleUploadCrateSummary triggered with", files.length, "files.");
+    if (files.length === 0) return;
+
+    const jobId = `job_crate_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    setStatusCrate("processing");
+    setProgressCrate(10);
+    setStatusTextCrate("Request received / upload complete");
+
+    const eventSource = new EventSource(`${API_BASE_URL}/progress/${jobId}`);
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        setProgressCrate(data.progress);
+        setStatusTextCrate(data.status);
+        if (data.progress === 100) {
+          eventSource.close();
+        }
+      } catch (e) {
+        console.error("Error parsing SSE data", e);
+      }
+    };
+
+    eventSource.onerror = (err) => {
+      console.error("SSE Crate Error:", err);
+      eventSource.close();
+    };
+
+    const formData = new FormData();
+    // Crate Summary uses single file 'excel' field
+    formData.append("excel", files[0]);
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/generate-crate-summary?jobId=${jobId}`, formData, {
+        responseType: 'blob',
+      });
+
+      const url = window.URL.createObjectURL(response.data);
+      const link = document.createElement('a');
+      link.href = url;
+      const contentDisposition = response.headers['content-disposition'];
+      const dateStr = new Date().toISOString().split('T')[0];
+      let filename = `Crate_Summary_${dateStr}.xlsx`;
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+        if (filenameMatch && filenameMatch.length === 2)
+          filename = filenameMatch[1];
+      }
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      setProgressCrate(100);
+      setStatusTextCrate("File ready for download");
+
+      setTimeout(() => {
+        setStatusCrate("idle");
+        setProgressCrate(0);
+        setStatusTextCrate("");
+      }, 2000);
+
+    } catch (error: any) {
+      eventSource.close();
+      console.error("--- ERROR DURING CRATE SUMMARY GENERATION ---", error);
+
+      let errorMessage = "An error occurred during crate summary generation.";
+      if (error.response && error.response.data instanceof Blob) {
+        try {
+          const text = await error.response.data.text();
+          const json = JSON.parse(text);
+          if (json.error) errorMessage = `Error: ${json.error}`;
+        } catch (e) {
+          if (error.response.statusText) errorMessage += ` (${error.response.statusText})`;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      alert(errorMessage + "\n\nPlease check the console for more details.");
+      setStatusCrate("idle");
+      setProgressCrate(0);
+      setStatusTextCrate("");
+    }
+  };
+
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -543,6 +635,64 @@ const Index = () => {
         type="euro"
         progress={progressEuro}
         statusText={statusTextEuro}
+      />
+
+      {/* Crate Summary Generator Section */}
+      <section className="py-20 md:py-24 px-4 bg-gradient-to-b from-cyan-50/50 to-background">
+        <div className="container mx-auto max-w-3xl text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-100/60 rounded-full text-sm text-cyan-700 mb-8">
+              <Package className="w-4 h-4" />
+              Packing ID
+            </span>
+          </motion.div>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ delay: 0.1, duration: 0.5, ease: "easeOut" }}
+            className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 leading-[1.1] tracking-tight"
+          >
+            Generate Crate Summary.{" "}
+            <span className="text-cyan-600">Effortlessly.</span>
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
+            className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-14 leading-relaxed"
+          >
+            Upload your Packing List Excel file. Our AI will group orders by crate, 
+            deduplicate items, and build a perfectly formatted summary for you.
+          </motion.p>
+
+          <UploadZoneCrateSummary onUpload={handleUploadCrateSummary} disabled={statusCrate === 'processing'} />
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ delay: 0.6, duration: 0.6 }}
+            className="text-sm text-muted-foreground mt-10"
+          >
+            Groups by Crates • Merges Duplicates • Calculates Totals • Standard Layout
+          </motion.p>
+        </div>
+      </section>
+
+      <ProcessingOverlay
+        isOpen={statusCrate === "processing"}
+        type="standard"
+        progress={progressCrate}
+        statusText={statusTextCrate}
       />
 
       {/* PDF Header Removal Section
