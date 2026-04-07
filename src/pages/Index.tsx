@@ -60,14 +60,14 @@ const Index = () => {
   const [statusTextEuro, setStatusTextEuro] = useState("");
   const [progressHeader, setProgressHeader] = useState(0);
   const [statusTextHeader, setStatusTextHeader] = useState("");
-  const [statusStrict, setStatusStrict] = useState<ConversionStatus>("idle");
+  const [statusStrict, setS3tatusStrict] = useState<ConversionStatus>("idle");
   const [progressStrict, setProgressStrict] = useState(0);
   const [statusTextStrict, setStatusTextStrict] = useState("");
   const [statusCrate, setStatusCrate] = useState<ConversionStatus>("idle");
   const [progressCrate, setProgressCrate] = useState(0);
   const [statusTextCrate, setStatusTextCrate] = useState("");
-  const API_BASE_URL = "https://convert-pdf-to-excel-1z5e.onrender.com";
-  // const API_BASE_URL = "http://localhost:3000";
+  // const API_BASE_URL = "https://convert-pdf-to-excel-1z5e.onrender.com";
+  const API_BASE_URL = "http://localhost:3000";
 
   const handleUpload = async (files: File[]) => {
     console.log("handleUpload triggered with", files.length, "files.");
