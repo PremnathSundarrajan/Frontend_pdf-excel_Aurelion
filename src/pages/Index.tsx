@@ -377,12 +377,12 @@ const API_BASE_URL = "http://localhost:3000";
       const link = document.createElement('a');
       link.href = url;
       const contentDisposition = response.headers['content-disposition'];
-      const dateStr = new Date().toISOString().split('T')[0];
-      let filename = `Strictly_Cleaned_${dateStr}.pdf`;
+      const dateStr = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+      let filename = `cleaned_pdfs_${dateStr}.zip`;
       if (contentDisposition) {
-        const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+        const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
         if (filenameMatch && filenameMatch.length === 2)
-          filename = filenameMatch[1];
+          filename = filenameMatch[1].trim();
       }
       link.setAttribute('download', filename);
       document.body.appendChild(link);
@@ -390,7 +390,7 @@ const API_BASE_URL = "http://localhost:3000";
       link.remove();
 
       setProgressStrict(100);
-      setStatusTextStrict("File ready for download");
+      setStatusTextStrict(`ZIP ready — ${files.length} file(s) cleaned`);
 
       setTimeout(() => {
         setStatusStrict("idle");
@@ -786,9 +786,9 @@ const API_BASE_URL = "http://localhost:3000";
             transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
             className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-14 leading-relaxed"
           >
-            Strictly removes everything above the table header row on Page 1.
-            Key-value based footer removal ensures drawings stay 100% safe.
-            Single file in, single file out.
+            Upload multiple PDFs at once. Each file's table-header and footer
+            anchors are detected independently — no cross-contamination.
+            Drawings stay 100% safe. Get a single ZIP with all cleaned files.
           </motion.p>
 
           <UploadZoneStrictPdfCleaner onUpload={handleUploadStrict} disabled={statusStrict === 'processing'} />
